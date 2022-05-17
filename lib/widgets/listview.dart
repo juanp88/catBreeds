@@ -5,25 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:cat_breed/model/cat_model.dart';
 import 'package:cat_breed/viewmodel/cats_view_model.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:provider/provider.dart';
 
 import 'not_available.dart';
 
 Widget catListView(CatsViewModel catsViewModel, context) {
-  //final catsList = Provider.of<CatsViewModel>(context, listen: true);
-  // String breed = catsList.searchBreed;
-
-  // List allCats = catsList.catListModel;
-
-  //  allCats.where(
-  //     (cat) {
-  //       final nameLower = cat.name.toLowerCase();
-  //       final searchLower = breed.toLowerCase();
-
-  //       return nameLower.contains(searchLower);
-  //     },
-  //   ).toList();
-
   return ListView.separated(
       itemBuilder: (context, index) {
         Cat cat = catsViewModel.catListModel[index];
@@ -36,18 +21,36 @@ Widget catListView(CatsViewModel catsViewModel, context) {
           onTap: () {
             //print(cat.name.toString());
             Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: ((context) => CatInformation(
-                          name: cat.name.toString(),
-                          description: cat.description.toString(),
-                          image:
-                              isURLValid ? cat.images!.url.toString() : 'null',
-                          adaptability: cat.adaptability.toString(),
-                          intelligence: cat.intelligence.toString(),
-                          energy_level: cat.energyLevel.toString(),
-                          affection_level: cat.affectionLevel.toString(),
-                        ))));
+              context,
+              PageRouteBuilder(
+                transitionsBuilder:
+                    (context, animation, secondaryAnimation, child) {
+                  return ScaleTransition(
+                    alignment: Alignment.center,
+                    scale: Tween<double>(begin: 0.1, end: 1).animate(
+                      CurvedAnimation(
+                        parent: animation,
+                        curve: Curves.easeOutQuart,
+                      ),
+                    ),
+                    child: child,
+                  );
+                },
+                transitionDuration: const Duration(milliseconds: 500),
+                pageBuilder: (BuildContext context, Animation<double> animation,
+                    Animation<double> secondaryAnimation) {
+                  return CatInformation(
+                    name: cat.name.toString(),
+                    description: cat.description.toString(),
+                    image: isURLValid ? cat.images!.url.toString() : 'null',
+                    adaptability: cat.adaptability.toString(),
+                    intelligence: cat.intelligence.toString(),
+                    energy_level: cat.energyLevel.toString(),
+                    affection_level: cat.affectionLevel.toString(),
+                  );
+                },
+              ),
+            );
           },
           child: Card(
             semanticContainer: true,
